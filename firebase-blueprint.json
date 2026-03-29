@@ -1,0 +1,93 @@
+{
+  "entities": {
+    "Match": {
+      "title": "Match",
+      "description": "A table tennis match between two players.",
+      "type": "object",
+      "properties": {
+        "player1": {
+          "type": "string",
+          "description": "Name of the first player."
+        },
+        "player2": {
+          "type": "string",
+          "description": "Name of the second player."
+        },
+        "score1": {
+          "type": "number",
+          "description": "Score of the first player."
+        },
+        "score2": {
+          "type": "number",
+          "description": "Score of the second player."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the match (e.g., League Match, Finals).",
+          "enum": ["League Match", "Quarter-Finals", "Semi-Finals", "Finals", "Friendly"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the match was recorded."
+        },
+        "authorUid": {
+          "type": "string",
+          "description": "UID of the user who recorded the match."
+        }
+      },
+      "required": ["player1", "player2", "score1", "score2", "type", "createdAt", "authorUid"]
+    },
+    "Player": {
+      "title": "Player",
+      "description": "A player in the league with their statistics.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the player."
+        },
+        "wins": {
+          "type": "number",
+          "description": "Total matches won."
+        },
+        "losses": {
+          "type": "number",
+          "description": "Total matches lost."
+        },
+        "points": {
+          "type": "number",
+          "description": "Total points earned."
+        },
+        "matches": {
+          "type": "number",
+          "description": "Total matches played."
+        },
+        "winRate": {
+          "type": "number",
+          "description": "Winning percentage of the player."
+        },
+        "skillLevel": {
+          "type": "string",
+          "description": "Skill level of the player.",
+          "enum": ["Beginner", "Intermediate", "Advanced"]
+        },
+        "rank": {
+          "type": "number",
+          "description": "Current rank of the player."
+        }
+      },
+      "required": ["name", "wins", "losses", "points", "matches"]
+    }
+  },
+  "firestore": {
+    "/matches/{matchId}": {
+      "schema": "Match",
+      "description": "Collection of matches recorded in the league."
+    },
+    "/players/{playerId}": {
+      "schema": "Player",
+      "description": "Collection of players and their statistics."
+    }
+  }
+}
