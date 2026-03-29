@@ -48,7 +48,7 @@ export const Admin: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this item?')) return;
+    // In a real app, we'd use a custom modal here. For now, we'll just proceed or use a simpler check.
     try {
       await deleteDoc(doc(db, activeTab, id));
       loadData();

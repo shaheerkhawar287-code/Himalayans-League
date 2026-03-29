@@ -28,6 +28,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   const { user, profile, isAdmin } = useAuth();
   const location = useLocation();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -47,10 +48,17 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   };
 
   const handleLogin = async () => {
+    if (isLoggingIn) return;
+    setIsLoggingIn(true);
     try {
       await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error('Login failed', error);
+    } catch (error: any) {
+      // Ignore cancelled popup request errors as they are usually harmless (e.g. user clicked twice)
+      if (error.code !== 'auth/cancelled-popup-request' && error.code !== 'auth/popup-closed-by-user') {
+        console.error('Login failed', error);
+      }
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -91,17 +99,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   {item.name}
                 </Link>
               ))}
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:text-blue-500",
-                    location.pathname === '/admin' ? "text-blue-500" : "text-zinc-600 dark:text-zinc-400"
-                  )}
-                >
-                  Admin
-                </Link>
-              )}
             </div>
 
             <div className="flex items-center space-x-4">
@@ -132,13 +129,22 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={handleLogin}
-                  className="flex items-center space-x-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full transition-colors text-sm font-medium"
-                >
-                  <LogIn className="w-4 h-4" />
-                  <span>Join League</span>
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={handleLogin}
+                    className="hidden sm:flex items-center space-x-2 px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:text-orange-500 transition-colors text-sm font-medium"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>Login</span>
+                  </button>
+                  <Link
+                    to="/register"
+                    className="flex items-center space-x-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full transition-colors text-sm font-medium shadow-lg shadow-orange-500/20"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>Sign Up</span>
+                  </Link>
+                </div>
               )}
 
               <button
@@ -176,22 +182,22 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     {item.name}
                   </Link>
                 ))}
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="block px-3 py-2 rounded-md text-base font-medium text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10"
-                  >
-                    Admin Panel
-                  </Link>
-                )}
                 {!user && (
-                  <button
-                    onClick={() => { handleLogin(); setIsMenuOpen(false); }}
-                    className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-500/10"
-                  >
-                    Login / Sign Up
-                  </button>
+                  <div className="space-y-1 pt-2">
+                    <button
+                      onClick={() => { handleLogin(); setIsMenuOpen(false); }}
+                      className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                    >
+                      Login
+                    </button>
+                    <Link
+                      to="/register"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block px-3 py-2 rounded-md text-base font-medium text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-500/10"
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
                 )}
               </div>
             </motion.div>

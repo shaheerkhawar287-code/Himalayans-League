@@ -5,9 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Himalayans League</title>
     <script>
-      // Polyfill global to prevent some libraries from trying to overwrite window.fetch
-      if (typeof global === 'undefined') {
-        window.global = {};
+      // Prevent libraries from trying to overwrite window.fetch which is a read-only getter in this environment
+      const originalFetch = window.fetch;
+      try {
+        Object.defineProperty(window, 'fetch', {
+          get: () => originalFetch,
+          set: (v) => { 
+            console.warn('Attempted to overwrite window.fetch. This operation was blocked to prevent errors.');
+          },
+          configurable: true
+        });
+      } catch (e) {
+        // Fallback if defineProperty fails
       }
     </script>
   </head>

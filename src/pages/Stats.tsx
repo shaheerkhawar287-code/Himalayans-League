@@ -93,28 +93,43 @@ export const Stats: React.FC = () => {
         </div>
       </div>
 
-      {/* Leaderboard Section */}
+      {/* Leaderboard & Comparison Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white dark:bg-zinc-900 p-8 rounded-[3rem] border border-zinc-100 dark:border-zinc-800 shadow-sm">
-          <h3 className="text-2xl font-black uppercase tracking-tight mb-8">Performance Trends</h3>
-          <div className="h-80 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={mockChartData}>
-                <defs>
-                  <linearGradient id="colorPoints" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12}} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                />
-                <Area type="monotone" dataKey="points" stroke="#f97316" strokeWidth={4} fillOpacity={1} fill="url(#colorPoints)" />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-2xl font-black uppercase tracking-tight">Win/Loss Comparison</h3>
+            <div className="flex items-center space-x-4 text-xs font-black uppercase tracking-widest">
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-3 bg-green-500 rounded-full" />
+                <span>Wins</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <div className="w-3 h-3 bg-red-500 rounded-full" />
+                <span>Losses</span>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-6">
+            {topPlayers.slice(0, 5).map((player, i) => (
+              <div key={player.id} className="space-y-2">
+                <div className="flex justify-between text-sm font-bold">
+                  <span>{player.name}</span>
+                  <span className="text-zinc-400">{player.wins}W - {player.losses}L</span>
+                </div>
+                <div className="h-4 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden flex">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(player.wins / (player.wins + player.losses || 1)) * 100}%` }}
+                    className="h-full bg-green-500"
+                  />
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(player.losses / (player.wins + player.losses || 1)) * 100}%` }}
+                    className="h-full bg-red-500"
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -155,66 +170,53 @@ export const Stats: React.FC = () => {
         </div>
       </div>
 
-      {/* Family Rivalry Tracker */}
-      <section className="bg-white dark:bg-zinc-900 p-12 rounded-[4rem] border border-zinc-100 dark:border-zinc-800 shadow-sm">
-        <div className="flex items-center space-x-4 mb-12">
-          <div className="p-3 bg-red-50 dark:bg-red-500/10 rounded-2xl">
-            <Heart className="w-8 h-8 text-red-500" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-black uppercase tracking-tight">Family Rivalry Tracker</h2>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {[
-            { family1: "The Sharmas", family2: "The Thapas", score: "12 - 8", intensity: "High" },
-            { family1: "Gurung Clan", family2: "Rai Warriors", score: "5 - 5", intensity: "Extreme" }
-          ].map((rivalry, i) => (
-            <div key={i} className="p-8 bg-zinc-50 dark:bg-zinc-800 rounded-[3rem] flex items-center justify-between">
-              <div className="text-center flex-1">
-                <p className="font-black text-xl">{rivalry.family1}</p>
-                <p className="text-xs text-zinc-400 uppercase font-bold">Family A</p>
-              </div>
-              <div className="px-6 text-center">
-                <p className="text-2xl font-black text-orange-500">{rivalry.score}</p>
-                <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-red-100 dark:bg-red-500/20 text-red-500 rounded-full">
-                  {rivalry.intensity}
-                </span>
-              </div>
-              <div className="text-center flex-1">
-                <p className="font-black text-xl">{rivalry.family2}</p>
-                <p className="text-xs text-zinc-400 uppercase font-bold">Family B</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Player of the Week */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-[4rem] p-12 md:p-20 text-white relative overflow-hidden">
+      {/* Top Players Showcase */}
+      <section className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-[4rem] p-12 md:p-20 text-white relative overflow-hidden shadow-2xl shadow-orange-500/30">
         <div className="absolute top-0 right-0 p-12 opacity-10">
-          <Star className="w-64 h-64" />
+          <Trophy className="w-64 h-64" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <span className="px-4 py-1.5 bg-white/20 rounded-full text-xs font-bold uppercase tracking-widest">Player of the Week</span>
-            <h2 className="text-5xl font-black uppercase tracking-tight">Arjun शर्मा</h2>
-            <div className="flex space-x-4">
-              <div className="text-center p-6 bg-white/10 rounded-3xl backdrop-blur-sm">
-                <p className="text-4xl font-black">15-0</p>
-                <p className="text-xs font-bold uppercase opacity-60">Record</p>
-              </div>
-              <div className="text-center p-6 bg-white/10 rounded-3xl backdrop-blur-sm">
-                <p className="text-4xl font-black">92%</p>
-                <p className="text-xs font-bold uppercase opacity-60">Accuracy</p>
-              </div>
-            </div>
+        <div className="relative z-10 space-y-12">
+          <div className="text-center space-y-4">
+            <span className="px-4 py-1.5 bg-white/20 rounded-full text-xs font-bold uppercase tracking-widest">League Elite</span>
+            <h2 className="text-5xl font-black uppercase tracking-tight">Top Players of the Season</h2>
           </div>
-          <div className="flex justify-center">
-            <div className="w-64 h-64 rounded-[3rem] bg-white/20 backdrop-blur-md flex items-center justify-center border-4 border-white/30">
-              <User className="w-32 h-32" />
-            </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {topPlayers.slice(0, 3).map((player, i) => (
+              <motion.div
+                key={player.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white/10 backdrop-blur-md p-8 rounded-[3rem] border border-white/20 text-center space-y-6"
+              >
+                <div className="relative inline-block">
+                  <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center text-4xl font-black">
+                    {player.name[0]}
+                  </div>
+                  <div className={cn(
+                    "absolute -top-2 -right-2 w-10 h-10 rounded-full flex items-center justify-center font-black border-4 border-orange-500",
+                    i === 0 ? "bg-yellow-500" : i === 1 ? "bg-zinc-300 text-zinc-900" : "bg-orange-400"
+                  )}>
+                    {i + 1}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black">{player.name}</h3>
+                  <p className="text-orange-100 font-bold uppercase tracking-widest text-xs">{player.position || 'Player'}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/10 p-4 rounded-2xl">
+                    <p className="text-2xl font-black">{player.points}</p>
+                    <p className="text-[10px] font-bold uppercase opacity-60">Points</p>
+                  </div>
+                  <div className="bg-white/10 p-4 rounded-2xl">
+                    <p className="text-2xl font-black">{player.wins}</p>
+                    <p className="text-[10px] font-bold uppercase opacity-60">Wins</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

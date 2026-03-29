@@ -23,7 +23,6 @@ export default function App() {
             <Route path="/stats" element={<Stats />} />
             <Route path="/matches" element={<Matches />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/admin" element={<Admin />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:userId" element={<Profile />} />
           </Routes>

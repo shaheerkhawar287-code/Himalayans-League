@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, User, Trophy, Star, Shield, Users, ArrowUpRight } from 'lucide-react';
+import { Search, Filter, User, Trophy, Star, Shield, Users, ArrowUpRight, Activity } from 'lucide-react';
 import { db, OperationType, handleFirestoreError } from '../firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { cn } from '../lib/utils';
 interface Player {
   id: string;
   name: string;
-  skillLevel: string;
+  position: string;
   role: string;
   teamId?: string;
   wins: number;
@@ -41,17 +41,21 @@ export const Players: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
+  const topPlayers = players.slice(0, 3);
+
   const filteredPlayers = players.filter(player => {
     const matchesSearch = player.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filter === 'All' || player.skillLevel === filter;
+    const matchesFilter = filter === 'All' || player.position === filter;
     return matchesSearch && matchesFilter;
   });
 
+  const positions = ['All', ...new Set(players.map(p => p.position).filter(Boolean))];
+
   return (
-    <div className="space-y-12 py-12">
+    <div className="space-y-16 py-12">
       <div className="flex flex-col md:flex-row justify-between items-center gap-8">
         <div>
-          <h1 className="text-5xl font-black mb-4">Players & Teams</h1>
+          <h1 className="text-5xl font-black mb-4">Players</h1>
           <p className="text-xl text-zinc-500">Meet the champions of the Himalayans League.</p>
         </div>
         
@@ -73,14 +77,56 @@ export const Players: React.FC = () => {
               onChange={(e) => setFilter(e.target.value)}
               className="pl-12 pr-8 py-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl appearance-none focus:ring-2 focus:ring-orange-500 transition-all"
             >
-              <option>All</option>
-              <option>Beginner</option>
-              <option>Intermediate</option>
-              <option>Advanced</option>
+              {positions.map(pos => (
+                <option key={pos} value={pos}>{pos}</option>
+              ))}
             </select>
           </div>
         </div>
       </div>
+
+      {/* Top Players Section */}
+      {!loading && topPlayers.length > 0 && (
+        <div className="space-y-8">
+          <div className="flex items-center space-x-4">
+            <Trophy className="w-8 h-8 text-yellow-500" />
+            <h2 className="text-3xl font-black">Top Players</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {topPlayers.map((player, index) => (
+              <Link key={player.id} to={`/profile/${player.id}`}>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={cn(
+                    "relative p-8 rounded-[3rem] border-2 transition-all hover:-translate-y-2",
+                    index === 0 ? "bg-yellow-50 border-yellow-200 dark:bg-yellow-500/5 dark:border-yellow-500/20" :
+                    index === 1 ? "bg-zinc-50 border-zinc-200 dark:bg-zinc-500/5 dark:border-zinc-500/20" :
+                    "bg-orange-50 border-orange-200 dark:bg-orange-500/5 dark:border-orange-500/20"
+                  )}
+                >
+                  <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-white dark:bg-zinc-900 border-2 border-inherit flex items-center justify-center font-black text-xl">
+                    {index + 1}
+                  </div>
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center text-white text-4xl font-black">
+                      {player.name[0]}
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold">{player.name}</h3>
+                      <p className="text-orange-500 font-black uppercase tracking-widest text-sm">{player.position}</p>
+                    </div>
+                    <div className="text-4xl font-black text-zinc-900 dark:text-white">
+                      {player.points} <span className="text-sm font-bold text-zinc-500 uppercase tracking-widest">pts</span>
+                    </div>
+                  </div>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -113,8 +159,8 @@ export const Players: React.FC = () => {
                   <div>
                     <h3 className="text-2xl font-bold">{player.name}</h3>
                     <div className="flex items-center space-x-2 text-zinc-500">
-                      <Shield className="w-4 h-4" />
-                      <span className="text-sm font-medium uppercase tracking-wider">{player.skillLevel}</span>
+                      <Activity className="w-4 h-4" />
+                      <span className="text-sm font-medium uppercase tracking-wider">{player.position}</span>
                     </div>
                   </div>
                 </div>
@@ -141,12 +187,6 @@ export const Players: React.FC = () => {
                       {badge}
                     </span>
                   ))}
-                  {player.teamId && (
-                    <span className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 rounded-full text-xs font-bold text-blue-500 flex items-center">
-                      <Users className="w-3 h-3 mr-1" />
-                      {player.teamId}
-                    </span>
-                  )}
                 </div>
               </motion.div>
             </Link>

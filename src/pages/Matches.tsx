@@ -51,7 +51,7 @@ export const Matches: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth.currentUser) {
-      alert('Please sign in to record a match.');
+      console.error('Please sign in to record a match.');
       return;
     }
 
@@ -91,7 +91,7 @@ export const Matches: React.FC = () => {
             losses: p1Loss,
             points: p1Points,
             matches: 1,
-            skillLevel: 'Beginner',
+            position: 'Player',
             rank: 0,
             winRate: p1Win > 0 ? 100 : 0
           });
@@ -124,7 +124,7 @@ export const Matches: React.FC = () => {
             losses: p2Loss,
             points: p2Points,
             matches: 1,
-            skillLevel: 'Beginner',
+            position: 'Player',
             rank: 0,
             winRate: p2Win > 0 ? 100 : 0
           });
